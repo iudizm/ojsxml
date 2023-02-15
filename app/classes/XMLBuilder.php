@@ -6,12 +6,12 @@ use XMLWriter;
 
 abstract class XMLBuilder
 {
-    /** @var XMLWriter $_xmlWriter */
-    private $_xmlWriter;
-    /** @var DBManager $_dbManager */
-    private $_dbManager;
-    /** @var string $_locale */
-    private $_locale;
+    /** @var XMLWriter $xmlWriter */
+    private $xmlWriter;
+    /** @var DBManager $dbManager */
+    private $dbManager;
+    /** @var string $locale */
+    private $locale;
 
     /**
      * IssuesXmlBuilder constructor.
@@ -20,16 +20,16 @@ abstract class XMLBuilder
      */
     public function __construct($filePath, &$dbManager = null)
     {
-        $this->_xmlWriter = new XmlWriter();
-        $this->_xmlWriter->openUri($filePath);
-        $this->_xmlWriter->startDocument();
-        $this->_xmlWriter->setIndent(true);
+        $this->xmlWriter = new XmlWriter();
+        $this->xmlWriter->openUri($filePath);
+        $this->xmlWriter->startDocument();
+        $this->xmlWriter->setIndent(true);
 
         if ($dbManager != null) {
-            $this->_dbManager = $dbManager;
+            $this->dbManager = $dbManager;
         }
 
-        $this->_locale = Config::get("locale");
+        $this->locale = Config::get("locale");
     }
 
     /**
@@ -42,7 +42,7 @@ abstract class XMLBuilder
      */
     protected function getXmlWriter()
     {
-        return $this->_xmlWriter;
+        return $this->xmlWriter;
     }
 
     /**
@@ -50,11 +50,11 @@ abstract class XMLBuilder
      */
     protected function getDBManager()
     {
-        return $this->_dbManager;
+        return $this->dbManager;
     }
 
     protected function addLocaleAttribute()
     {
-        $this->_xmlWriter->writeAttribute("locale", $this->_locale);
+        $this->xmlWriter->writeAttribute("locale", $this->locale);
     }
 }
