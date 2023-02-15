@@ -4,47 +4,47 @@ namespace OJSXml;
 
 class UsersXmlBuilder extends XMLBuilder
 {
-    private array $_data;
-    private bool $_isTest;
+    private array $csvData;
+    private bool $isTest;
 
-    public function __construct($isTest, $filePath, &$dbManager = null)
+    public function __construct(bool $isTest, $filePath, &$dbManager = null)
     {
-        $this->_isTest = $isTest;
+        $this->isTest = $isTest;
         parent::__construct($filePath, $dbManager);
     }
-
 
     /**
      * Set data to object used for creating xml
      *
-     * @param array $data
+     * @param array $csvData
      */
-    public function setData($data)
+    public function setData($csvData)
     {
-        $this->_data = $data;
+        $this->csvData = $csvData;
     }
-
 
     /**
      * Converts single csv file of users to import xml
      */
     public function buildXml()
     {
-        $this->getXmlWriter()->startElement("PKPUsers");
-        $this->getXmlWriter()->writeAttribute("xmlns", "http://pkp.sfu.ca");
-        $this->getXmlWriter()->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        $this->getXmlWriter()->writeAttribute("xsi:schemaLocation", "http://pkp.sfu.ca pkp-users.xsd");
-        $this->getXmlWriter()->startElement("users");
+        $xml = $this->getXmlWriter();
+        $xml->startElement("PKPUsers");
+        $xml->writeAttribute("xmlns", "http://pkp.sfu.ca");
+        $xml->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        $xml->writeAttribute("xsi:schemaLocation", "http://pkp.sfu.ca pkp-users.xsd");
+        $xml->startElement("users");
 
-        foreach ($this->_data as $userData) {
-            $this->writeUser($userData);
+        $userBuilder = new UserBuilder($this->isTest);
+        foreach ($this->csvData as $userData) {
+            $this->writeUser($userBuilder->buildUserData($userData));
         }
 
-        $this->getXmlWriter()->endElement();
-        $this->getXmlWriter()->endElement();
+        $xml->endElement();
+        $xml->endElement();
 
-        $this->getXmlWriter()->endDocument();
-        $this->getXmlWriter()->flush();
+        $xml->endDocument();
+        $xml->flush();
     }
 
     /**
@@ -52,83 +52,79 @@ class UsersXmlBuilder extends XMLBuilder
      */
     public function writeUser($userData)
     {
-        $this->getXmlWriter()->startElement("user");
+        $xml = $this->getXmlWriter();
+        $xml->startElement("user");
 
-        $this->getXmlWriter()->startElement("givenname");
+        $xml->startElement("givenname");
         $this->addLocaleAttribute();
-        $this->getXmlWriter()->writeRaw($userData["firstname"]);
-        $this->getXmlWriter()->endElement();
+        $xml->writeRaw($userData["firstname"]);
+        $xml->endElement();
 
         if (!empty($userData["lastname"])) {
-            $this->getXmlWriter()->startElement("familyname");
+            $xml->startElement("familyname");
             $this->addLocaleAttribute();
-            $this->getXmlWriter()->writeRaw($userData["lastname"]);
-            $this->getXmlWriter()->endElement();
+            $xml->writeRaw($userData["lastname"]);
+            $xml->endElement();
         }
 
         if (!empty($userData["affiliation"])) {
-            $this->getXmlWriter()->startElement("affiliation");
+            $xml->startElement("affiliation");
             $this->addLocaleAttribute();
-            $this->getXmlWriter()->writeRaw($userData["affiliation"]);
-            $this->getXmlWriter()->endElement();
+            $xml->writeRaw($userData["affiliation"]);
+            $xml->endElement();
         }
 
         if (!empty($userData["country"])) {
-            $this->getXmlWriter()->startElement("country");
-            $this->getXmlWriter()->writeRaw($userData["country"]);
-            $this->getXmlWriter()->endElement();
+            $xml->startElement("country");
+            $xml->writeRaw($userData["country"]);
+            $xml->endElement();
         }
 
-        $this->getXmlWriter()->startElement("email");
-        $firstEmail = explode(',', $userData["email"]);
-        if (sizeof($firstEmail) > 1) {
-            Logger::print($userData["username"] . ' email truncated to first provided.');
-        }
-        $this->getXmlWriter()->writeRaw($this->_isTest ? htmlspecialchars($firstEmail[0]) . "test" : htmlspecialchars($firstEmail[0]));
-        $this->getXmlWriter()->endElement();
+        $xml->startElement("email");
+        $xml->writeRaw($userData["email"]);
+        $xml->endElement();
 
-        $this->getXmlWriter()->startElement("username");
-        $this->getXmlWriter()->writeRaw($userData["username"]);
-        $this->getXmlWriter()->endElement();
+        $xml->startElement("username");
+        $xml->writeRaw($userData["username"]);
+        $xml->endElement();
 
-        $this->getXmlWriter()->startElement("password");
-        $this->getXmlWriter()->writeAttribute("must_change", "true");
-        if (empty($userData["tempPassword"])) {
-            $this->getXmlWriter()->writeAttribute("encryption", "plaintext");
-        }
+        $xml->startElement("password");
+        $xml->writeAttribute("must_change", "true");
+        // if (empty($userData["tempPassword"])) {
+        //     $xml->writeAttribute("encryption", "plaintext");
+        // }
+        $xml->startElement("value");
+        $xml->writeRaw($userData["tempPassword"]);
+        $xml->endElement();
 
-        $this->getXmlWriter()->startElement("value");
-        $this->getXmlWriter()->writeRaw(empty($userData["tempPassword"]) ? '' : $userData["tempPassword"]);
-        $this->getXmlWriter()->endElement();
+        $xml->endElement();
 
-        $this->getXmlWriter()->endElement();
+        $xml->startElement("date_registered");
+        $xml->writeRaw(date("Y-m-d H:i:s"));
+        $xml->endElement();
 
-        $this->getXmlWriter()->startElement("date_registered");
-        $this->getXmlWriter()->writeRaw(date("Y-m-d H:i:s"));
-        $this->getXmlWriter()->endElement();
+        $xml->startElement("date_last_login");
+        $xml->writeRaw(date("Y-m-d H:i:s"));
+        $xml->endElement();
 
-        $this->getXmlWriter()->startElement("date_last_login");
-        $this->getXmlWriter()->writeRaw(date("Y-m-d H:i:s"));
-        $this->getXmlWriter()->endElement();
-
-        $this->getXmlWriter()->startElement("inline_help");
-        $this->getXmlWriter()->writeRaw("true");
-        $this->getXmlWriter()->endElement();
+        $xml->startElement("inline_help");
+        $xml->writeRaw("true");
+        $xml->endElement();
 
         for ($i = 1; $i < 6; $i++) {
-            if (isset($userData["role" . $i]) && $userData["role" . $i] != "") {
-                $this->getXmlWriter()->startElement("user_group_ref");
-                $this->getXmlWriter()->writeRaw(userGroupRef($userData["role" . $i]));
-                $this->getXmlWriter()->endElement();
+            if (isset($userData["role" . $i])) {
+                $xml->startElement("user_group_ref");
+                $xml->writeRaw($userData["role" . $i]);
+                $xml->endElement();
             }
         }
 
         if (!empty($userData["reviewInterests"])) {
-            $this->getXmlWriter()->startElement("review_interests");
-            $this->getXmlWriter()->writeRaw($userData["reviewInterests"]);
-            $this->getXmlWriter()->endElement();
+            $xml->startElement("review_interests");
+            $xml->writeRaw($userData["reviewInterests"]);
+            $xml->endElement();
         }
 
-        $this->getXmlWriter()->endElement();
+        $xml->endElement();
     }
 }

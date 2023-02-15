@@ -16,6 +16,7 @@ require('classes/TempTable.php');
 require('classes/XMLBuilder.php');
 require('classes/IssuesXmlBuilder.php');
 require('classes/UsersXmlBuilder.php');
+require('classes/UserBuilder.php');
 require('classes/DBManager.php');
 
 require('helpers/helpers.php');
