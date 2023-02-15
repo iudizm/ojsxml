@@ -1,14 +1,12 @@
 <?php
 
-
 namespace OJSXml;
-
 
 use DateTime;
 use DateTimeZone;
 
-class Logger {
-
+class Logger
+{
     public static array $messages = [];
 
     private static string $_fileName = '';
@@ -16,7 +14,8 @@ class Logger {
     /**
      * @throws \Exception
      */
-    public static function __constructStatic() {
+    public static function __constructStatic()
+    {
         $tz = 'America/Vancouver';
         $timestamp = time();
         $dt = new DateTime("now", new DateTimeZone($tz)); //first argument "must" be a string
@@ -24,13 +23,15 @@ class Logger {
         self::$_fileName = $dt->format('YmdHi') . '_log.txt';
     }
 
-    public static function print(string $message) {
+    public static function print(string $message)
+    {
         array_push(self::$messages, $message);
         echo $message . PHP_EOL;
     }
 
 
-    public static function writeOut($command, $user) {
+    public static function writeOut($command, $user)
+    {
         $file = fopen(Config::get('logLocation') . '/' . $command . '_' . $user . '_'. self::$_fileName, 'w');
         if ($file !== false) {
             fwrite($file, self::formatToString(self::$messages));
@@ -44,7 +45,8 @@ class Logger {
      * @param $string
      * @return string
      */
-    private static function formatToString(array $messages) : string {
+    private static function formatToString(array $messages): string
+    {
         $returner = '';
 
         foreach ($messages as $message) {

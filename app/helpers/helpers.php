@@ -3,50 +3,55 @@
  * output debug
  * @param $s
  */
-function pre($s){
-
+function pre($s)
+{
     echo "<pre>";
     print_r($s);
     echo "</pre>";
 }
 
-function get_file_extension($file_name) {
-    return substr(strrchr($file_name,'.'),1);
+function get_file_extension($file_name)
+{
+    return substr(strrchr($file_name, '.'), 1);
 }
 
 
-function semiColonFix($keywords){
-    $keywords = str_replace("; ", ";",$keywords);
+function semiColonFix($keywords)
+{
+    $keywords = str_replace("; ", ";", $keywords);
     $keywords = str_replace(";", "; ", $keywords);
 
     return $keywords;
 }
 
-function parseSemiColon($keywords){
+function parseSemiColon($keywords)
+{
     $keywords = semiColonFix($keywords);
 
-    return explode(";",$keywords);
+    return explode(";", $keywords);
 }
 
-function xmlFormat($string_from_hell){
+function xmlFormat($string_from_hell)
+{
     $string_from_hell  = htmlspecialchars($string_from_hell, ENT_QUOTES, "UTF-8");
-    $string_from_hell = str_replace('—','&#8212;',$string_from_hell);
-    $string_from_hell = str_replace('’','&#8217;',$string_from_hell);
-    $string_from_hell = str_replace('‘','&#8216;',$string_from_hell);
-    $string_from_hell = str_replace('“','&#8220;',$string_from_hell);
-    $string_from_hell = str_replace('”','&#8221;',$string_from_hell);
+    $string_from_hell = str_replace('—', '&#8212;', $string_from_hell);
+    $string_from_hell = str_replace('’', '&#8217;', $string_from_hell);
+    $string_from_hell = str_replace('‘', '&#8216;', $string_from_hell);
+    $string_from_hell = str_replace('“', '&#8220;', $string_from_hell);
+    $string_from_hell = str_replace('”', '&#8221;', $string_from_hell);
     return $string_from_hell;
 }
 
-function getFiletype($ext){
+function getFiletype($ext)
+{
     $ext = strtolower($ext);
     if ($ext == 'pdf') {
         $type = "application/pdf";
-    }elseif($ext == 'html' || $ext == 'htm'){
+    } elseif ($ext == 'html' || $ext == 'htm') {
         $type='text/html';
-    }elseif($ext == 'docx' || $ext == 'doc'){
+    } elseif ($ext == 'docx' || $ext == 'doc') {
         $type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    }else{
+    } else {
         $type = 'plain/text';
     }
     return $type;
@@ -56,8 +61,9 @@ function getFiletype($ext){
  * @param type $filename
  * @return string
  */
-function get_mime_type($filename) {
-    $idx = explode( '.', $filename );
+function get_mime_type($filename)
+{
+    $idx = explode('.', $filename);
     $count_explode = count($idx);
     $idx = strtolower($idx[$count_explode-1]);
 
@@ -120,36 +126,37 @@ function get_mime_type($filename) {
         'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
     );
 
-    if (isset( $mimet[$idx] )) {
-     return $mimet[$idx];
+    if (isset($mimet[$idx])) {
+        return $mimet[$idx];
     } else {
-     return 'application/octet-stream';
+        return 'application/octet-stream';
     }
- }
+}
 
 
-function userGroupRef($role){
+function userGroupRef($role)
+{
     $role = trim($role);
     if ($role == "Journal manager") {
         return $role;
-    } else if ($role=='Section editor'){
+    } elseif ($role=='Section editor') {
         return $role;
-    } else if ($role=='Reviewer'){
+    } elseif ($role=='Reviewer') {
         return $role;
-    } else if ($role == 'Author') {
+    } elseif ($role == 'Author') {
         return $role;
-    } else{
+    } else {
         return "Reader";
     }
-
 }
 
-function fileExtensionAppender($fileName, $desiredExtention='pdf'){
-    $file = explode(".",$fileName);
-    if (! isset($file[1])){
+function fileExtensionAppender($fileName, $desiredExtention='pdf')
+{
+    $file = explode(".", $fileName);
+    if (! isset($file[1])) {
         return $fileName . "." . $desiredExtention;
     }
-     return $fileName;
+    return $fileName;
 }
 
 
@@ -170,17 +177,18 @@ function fileExtensionAppender($fileName, $desiredExtention='pdf'){
  */
 function csv_to_array($filename='', $delimiter=',')
 {
-    if(!file_exists($filename) || !is_readable($filename) || is_dir($filename))
+    if (!file_exists($filename) || !is_readable($filename) || is_dir($filename)) {
         return false;
+    }
 
     $header = null;
     $data = array();
-    if (($handle = fopen($filename, 'r')) !== false)
-    {
-        while (($row = fgetcsv($handle, 10000, $delimiter,'"')) !== FALSE)
-        {
+    if (($handle = fopen($filename, 'r')) !== false) {
+        while (($row = fgetcsv($handle, 10000, $delimiter, '"')) !== false) {
             $cleanedUpRow = removeZeroWidthSpaces($row);
-            if (empty($cleanedUpRow[0])) continue;
+            if (empty($cleanedUpRow[0])) {
+                continue;
+            }
 
             if (!$header) {
                 $header = $cleanedUpRow;
@@ -205,12 +213,16 @@ function csv_to_array($filename='', $delimiter=',')
  * @param $text
  * @return string|string[]|null
  */
-function removeZeroWidthSpaces($text) {
-    return preg_replace( '/[\x{200B}-\x{200D}\x{FEFF}\x{00A0}]/u', '', $text );
+function removeZeroWidthSpaces($text)
+{
+    return preg_replace('/[\x{200B}-\x{200D}\x{FEFF}\x{00A0}]/u', '', $text);
 }
 
-function formatDateInRow(&$dataArray) {
-    if (empty($dataArray['datePublished'])) return;
+function formatDateInRow(&$dataArray)
+{
+    if (empty($dataArray['datePublished'])) {
+        return;
+    }
 
     $dirtyDate = $dataArray['datePublished'];
     $dateTime = DateTime::createFromFormat(\OJSXml\Config::get("dateFormat"), $dirtyDate);
@@ -218,14 +230,20 @@ function formatDateInRow(&$dataArray) {
     $dataArray['datePublished'] = $sanitizedDate;
 }
 
-function formatKeywords(&$dataArray) {
-    if (empty($dataArray['keywords'])) return;
-    $sanitizedKeywords = str_replace(',',';',$dataArray['keywords']);
+function formatKeywords(&$dataArray)
+{
+    if (empty($dataArray['keywords'])) {
+        return;
+    }
+    $sanitizedKeywords = str_replace(',', ';', $dataArray['keywords']);
     $dataArray['keywords'] = $sanitizedKeywords;
 }
 
-function cleanAbstracts(&$dataArray) {
-    if (empty($dataArray['articleAbstract'])) return;
+function cleanAbstracts(&$dataArray)
+{
+    if (empty($dataArray['articleAbstract'])) {
+        return;
+    }
 
     $abstract =& $dataArray['articleAbstract'];
 
@@ -237,7 +255,7 @@ function cleanAbstracts(&$dataArray) {
     }
 
     // 1) Always ensure tags are properly formatted
-    str_replace($abstract,'<p>','<P>');
+    str_replace($abstract, '<p>', '<P>');
     str_replace($abstract, '</p>', '</P>');
 
 
@@ -247,7 +265,9 @@ function cleanAbstracts(&$dataArray) {
         $paragraphs = explode('<p>', $abstract);
 
         foreach ($paragraphs as $paragraph) {
-            if (empty($paragraph)) {continue;}
+            if (empty($paragraph)) {
+                continue;
+            }
             $paragraph = trim($paragraph);
 
             $paragraph = '<p>' . $paragraph;
@@ -258,14 +278,15 @@ function cleanAbstracts(&$dataArray) {
 
             $newAbstract = $newAbstract . $paragraph;
         }
-
     }
     // 3 Handle extra close tags
     else {
         $paragraphs = explode('</p>', $abstract);
 
         foreach ($paragraphs as $paragraph) {
-            if (empty($paragraph)) {continue;}
+            if (empty($paragraph)) {
+                continue;
+            }
             $paragraph = trim($paragraph);
 
             if (strpos($paragraph, '<p>') === false) {
@@ -276,7 +297,6 @@ function cleanAbstracts(&$dataArray) {
 
             $newAbstract = $newAbstract . $paragraph;
         }
-
     }
     $abstract = $newAbstract;
 }
@@ -288,14 +308,15 @@ function cleanAbstracts(&$dataArray) {
  * @param int $iteration
  * @return string
  */
-function formatOutputFileNumber($totalItemCount, $iteration) {
+function formatOutputFileNumber($totalItemCount, $iteration)
+{
     $totalDigitCount = 0;
 
     if ($totalItemCount > 999) {
         $totalDigitCount = 4;
-    } else if ($totalItemCount < 999 && $totalItemCount > 99) {
+    } elseif ($totalItemCount < 999 && $totalItemCount > 99) {
         $totalDigitCount = 3;
-    } else if ($totalItemCount < 99 && $totalItemCount > 9) {
+    } elseif ($totalItemCount < 99 && $totalItemCount > 9) {
         $totalDigitCount = 2;
     } else {
         $totalDigitCount = 1;
@@ -306,22 +327,21 @@ function formatOutputFileNumber($totalItemCount, $iteration) {
         if ($totalDigitCount > 3) {
             $outputPrefix = '0';
         }
-    } else if ($iteration < 100 && $iteration > 9) {
+    } elseif ($iteration < 100 && $iteration > 9) {
         if ($totalDigitCount > 3) {
             $outputPrefix = '00';
-        } else if ($totalDigitCount > 2) {
+        } elseif ($totalDigitCount > 2) {
             $outputPrefix = '0';
         }
     } else {
         if ($totalDigitCount > 3) {
             $outputPrefix = '000';
-        } else if ($totalDigitCount > 2) {
+        } elseif ($totalDigitCount > 2) {
             $outputPrefix = '00';
-        } else if ($totalDigitCount > 1) {
+        } elseif ($totalDigitCount > 1) {
             $outputPrefix = '0';
         }
     }
 
     return $outputPrefix . (string) $iteration;
-
 }

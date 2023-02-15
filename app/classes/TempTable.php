@@ -1,15 +1,11 @@
 <?php
 
-
 namespace OJSXml;
-
-
 
 use Exception;
 
 class TempTable
 {
-
     protected $db;
     protected $tempTableName;
 
@@ -18,24 +14,24 @@ class TempTable
      * @param \App\Database $db
      * @param string $tempTableName
      */
-    function __construct(Database $db, $tempTableName='ojs_import_helper')
+    public function __construct(Database $db, $tempTableName='ojs_import_helper')
     {
         $this->db = $db;
         $this->tempTableName=$tempTableName;
 
         $this->createTable();
-
     }
 
-    function truncate(){
+    public function truncate()
+    {
         $this->db->query("DELETE FROM " . $this->tempTableName);
         $this->db->execute();
     }
 
-    function isEmpty(){
-
+    public function isEmpty()
+    {
         $row = $this->db->single("Select count(*) as counter from " .$this->tempTableName);
-        if($row['counter']>0){
+        if ($row['counter']>0) {
             throw new Exception("Table '" . $this->tempTableName . "' must be blank to start the process");
         }
         return true;
@@ -43,8 +39,8 @@ class TempTable
 
 
 
-    private function createTable(){
-
+    private function createTable()
+    {
         $sql = "CREATE TABLE IF NOT EXISTS " . $this->tempTableName . " (      
                       `issueTitle` varchar(500)  DEFAULT NULL,
                       `sectionTitle` varchar(500)  DEFAULT NULL,
@@ -74,14 +70,12 @@ class TempTable
 
         $this->db->query($sql);
         $this->db->execute();
- 
     }
-    
 
 
-    function insertAssocDataIntoTempTable($data){
 
-
+    public function insertAssocDataIntoTempTable($data)
+    {
         $sql = "INSERT into  " . $this->tempTableName . "
                               (issueTitle,sectionTitle,sectionAbbrev,authors,affiliations,DOI,articleTitle,subTitle,`year`,datePublished,volume,issue,startPage,endPage,articleAbstract,galleyLabel,
                               authorEmail,fileName,supplementary_files,dependent_files,keywords,cover_image_filename,cover_image_alt_text,language) 
@@ -94,11 +88,11 @@ class TempTable
         $this->db->bind(':sectionAbbrev', $data['sectionAbbrev']);
         $this->db->bind(':authors', $data['authors']);
 
-        if(isset($data['affiliation']) || isset($data['affiliations'])){
-        $this->db->bind(':affiliations', (isset($data['affiliation'])?$data['affiliation']:$data['affiliations']));
-        }elseif(isset($data['authorAffiliation'])){
+        if (isset($data['affiliation']) || isset($data['affiliations'])) {
+            $this->db->bind(':affiliations', (isset($data['affiliation']) ? $data['affiliation'] : $data['affiliations']));
+        } elseif (isset($data['authorAffiliation'])) {
             $this->db->bind(':affiliations', $data['authorAffiliation']);
-        }else{
+        } else {
             $this->db->bind(':affiliations', '');
         }
 
@@ -115,21 +109,20 @@ class TempTable
         $this->db->bind(':galleyLabel', $data['galleyLabel']);
         $this->db->bind(':authorEmail', $data['authorEmail']);
         $this->db->bind(':fileName', $data['fileName']);
-        $this->db->bind(':supplementary_files', $data['supplementary_files']?? '' );
-        $this->db->bind(':dependent_files', $data['dependent_files']?? '' );
-        
+        $this->db->bind(':supplementary_files', $data['supplementary_files']?? '');
+        $this->db->bind(':dependent_files', $data['dependent_files']?? '');
+
 
 
         $val = "";
-        if(key_exists('keywords',$data)){
+        if (key_exists('keywords', $data)) {
             $val = $data['keywords'];
         }
-        $this->db->bind(':keywords',$val);
+        $this->db->bind(':keywords', $val);
         $this->db->bind(':cover_image_filename', $data['cover_image_filename']??'');
         $this->db->bind(':cover_image_alt_text', $data['cover_image_alt_text']??'');
         $this->db->bind(':language', $data['language']??'');
-        
+
         $this->db->execute();
     }
-
 }

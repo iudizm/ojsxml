@@ -1,15 +1,14 @@
 <?php
 
-
 namespace OJSXml;
 
-
-class UsersXmlBuilder extends XMLBuilder {
-
+class UsersXmlBuilder extends XMLBuilder
+{
     private array $_data;
     private bool $_isTest;
 
-    public function __construct($isTest, $filePath, &$dbManager = null) {
+    public function __construct($isTest, $filePath, &$dbManager = null)
+    {
         $this->_isTest = $isTest;
         parent::__construct($filePath, $dbManager);
     }
@@ -20,7 +19,8 @@ class UsersXmlBuilder extends XMLBuilder {
      *
      * @param array $data
      */
-    function setData($data) {
+    public function setData($data)
+    {
         $this->_data = $data;
     }
 
@@ -28,7 +28,8 @@ class UsersXmlBuilder extends XMLBuilder {
     /**
      * Converts single csv file of users to import xml
      */
-    public function buildXml() {
+    public function buildXml()
+    {
         $this->getXmlWriter()->startElement("PKPUsers");
         $this->getXmlWriter()->writeAttribute("xmlns", "http://pkp.sfu.ca");
         $this->getXmlWriter()->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
@@ -49,7 +50,8 @@ class UsersXmlBuilder extends XMLBuilder {
     /**
      * @param array $userData
      */
-    function writeUser($userData) {
+    public function writeUser($userData)
+    {
         $this->getXmlWriter()->startElement("user");
 
         $this->getXmlWriter()->startElement("givenname");
@@ -129,7 +131,4 @@ class UsersXmlBuilder extends XMLBuilder {
 
         $this->getXmlWriter()->endElement();
     }
-
-
-
 }

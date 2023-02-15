@@ -1,13 +1,11 @@
 <?php
 
-
 namespace OJSXml;
 
-use \SQLite3;
+use SQLite3;
 
 class SQLiteDB implements Database
 {
-
     private $stmt;
 
     private $error;
@@ -16,21 +14,18 @@ class SQLiteDB implements Database
     private $handle;
     private $rowcount;
 
-    function __construct($location){
-
-        try{
+    public function __construct($location)
+    {
+        try {
             $this->handle = new SQLite3($location);
-
-        } catch(Exception $e){
+        } catch(Exception $e) {
             $this->error = $e->getMessage();
         }
     }
 
-    public function query($query){
-
-
+    public function query($query)
+    {
         $this->stmt  = $this->handle->prepare($query);
-
     }
 
     /**
@@ -39,7 +34,8 @@ class SQLiteDB implements Database
      * @param String $value is the actual value that we want to bind to the placeholder, example “John Smith”.
      * @param null $type is the datatype of the parameter, example string.
      */
-    public function bind($param, $value, $type = null){
+    public function bind($param, $value, $type = null)
+    {
         if (is_null($type)) {
             switch (true) {
                 case is_int($value):
@@ -62,20 +58,22 @@ class SQLiteDB implements Database
      * @description The next method we will be look at is the PDOStatement::execute. The execute method executes the prepared statement.
      * @return mixed
      */
-    public function execute(){
+    public function execute()
+    {
         return $this->stmt->execute();
     }
 
-    public function single($query){
-
+    public function single($query)
+    {
         return $this->handle->querySingle($query, true);
     }
 
-    public function resultset(){
+    public function resultset()
+    {
         $result = $this->execute();
         $row = array();
 
-        while ( $res = $result->fetchArray(SQLITE3_ASSOC)){
+        while ($res = $result->fetchArray(SQLITE3_ASSOC)) {
             $row[] = $res;
             $this->rowcount++;
         }
@@ -83,11 +81,8 @@ class SQLiteDB implements Database
         return $row;
     }
 
-    public function rowCount(){
+    public function rowCount()
+    {
         return $this->rowCount();
     }
-
-
-
-
 }

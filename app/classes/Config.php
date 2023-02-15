@@ -1,18 +1,18 @@
 <?php
 
-
 namespace OJSXml;
 
+class Config
+{
+    private static $data;
 
-class Config {
-    static private $data;
-
-    static public function load($configFile) {
+    public static function load($configFile)
+    {
         self::$data = parse_ini_file($configFile);
     }
 
-    static public function get($key) {
+    public static function get($key)
+    {
         return self::$data[$key];
     }
-
 }

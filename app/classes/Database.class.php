@@ -5,10 +5,10 @@
 
 namespace OJSXml;
 
-use \PDO;
+use PDO;
 
-class Database {
-
+class Database
+{
     private $stmt;
     private $dbh;
     private $error;
@@ -18,25 +18,25 @@ class Database {
     private $pass      = DB_PASS;
     private $dbname    = DB_NAME;
 
-    function __construct(){
+    public function __construct()
+    {
+        $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
+        // Set options
+        $options = array(
+            PDO::ATTR_PERSISTENT    => true,
+            PDO::ATTR_ERRMODE       => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+        );
 
-            $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
-            // Set options
-            $options = array(
-                PDO::ATTR_PERSISTENT    => true,
-                PDO::ATTR_ERRMODE       => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
-            );
-
-            try{
-                $this->dbh = new PDO($dsn, $this->user, $this->pass, $options);
-            } catch(PDOException $e){
-                $this->error = $e->getMessage();
-            }
-
+        try {
+            $this->dbh = new PDO($dsn, $this->user, $this->pass, $options);
+        } catch(PDOException $e) {
+            $this->error = $e->getMessage();
+        }
     }
 
-    public function query($query){
+    public function query($query)
+    {
         $this->stmt = $this->dbh->prepare($query);
     }
 
@@ -46,7 +46,8 @@ class Database {
      * @param String $value is the actual value that we want to bind to the placeholder, example “John Smith”.
      * @param null $type is the datatype of the parameter, example string.
      */
-    public function bind($param, $value, $type = null){
+    public function bind($param, $value, $type = null)
+    {
         if (is_null($type)) {
             switch (true) {
                 case is_int($value):
@@ -69,43 +70,50 @@ class Database {
      * @description The next method we will be look at is the PDOStatement::execute. The execute method executes the prepared statement.
      * @return mixed
      */
-    public function execute(){
+    public function execute()
+    {
         return $this->stmt->execute();
     }
 
-    public function single(){
+    public function single()
+    {
         $this->execute();
         return $this->stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function resultset(){
+    public function resultset()
+    {
         $this->execute();
         return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function rowCount(){
+    public function rowCount()
+    {
         return $this->stmt->rowCount();
     }
 
-    public function lastInsertId(){
+    public function lastInsertId()
+    {
         return $this->dbh->lastInsertId();
     }
 
-    public function beginTransaction(){
+    public function beginTransaction()
+    {
         return $this->dbh->beginTransaction();
     }
 
-    public function endTransaction(){
+    public function endTransaction()
+    {
         return $this->dbh->commit();
     }
 
-    public function cancelTransaction(){
+    public function cancelTransaction()
+    {
         return $this->dbh->rollBack();
     }
 
-    public function debugDumpParams(){
+    public function debugDumpParams()
+    {
         return $this->stmt->debugDumpParams();
     }
-
-
-} 
+}

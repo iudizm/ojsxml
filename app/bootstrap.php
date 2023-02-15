@@ -13,13 +13,13 @@ require('classes/DatabaseFactory.php');
 require('classes/Authors.php');
 require('classes/TempTable.php');
 
-require ('classes/XMLBuilder.php');
+require('classes/XMLBuilder.php');
 require('classes/IssuesXmlBuilder.php');
 require('classes/UsersXmlBuilder.php');
 require('classes/DBManager.php');
 
 require('helpers/helpers.php');
-require ('classes/Config.php');
+require('classes/Config.php');
 
 require('classes/Logger.php');
 

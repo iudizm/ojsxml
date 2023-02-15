@@ -9,7 +9,8 @@ define("USER_FILES_PATTERN", "./csv/users/*");
 generateIssuesXml();
 //generateUsersXml();
 
-function generateIssuesXml() {
+function generateIssuesXml()
+{
     $dbManager = new DBManager();
     $dbManager->importIssueCsvData("./csv/abstracts/*");
 
@@ -22,7 +23,8 @@ function generateIssuesXml() {
     }
 }
 
-function generateUsersXml() {
+function generateUsersXml()
+{
     $files = glob(USER_FILES_PATTERN);
     $filesCount = 0;
 

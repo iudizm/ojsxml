@@ -1,11 +1,11 @@
 <?php
 
-
 namespace OJSXml;
 
 use XMLWriter;
 
-abstract class XMLBuilder {
+abstract class XMLBuilder
+{
     /** @var XMLWriter $_xmlWriter */
     private $_xmlWriter;
     /** @var DBManager $_dbManager */
@@ -18,8 +18,8 @@ abstract class XMLBuilder {
      *
      * @param $filePath
      */
-    function __construct($filePath, &$dbManager = null) {
-
+    public function __construct($filePath, &$dbManager = null)
+    {
         $this->_xmlWriter = new XmlWriter();
         $this->_xmlWriter->openUri($filePath);
         $this->_xmlWriter->startDocument();
@@ -35,24 +35,26 @@ abstract class XMLBuilder {
     /**
      * Builds and closed xml file
      */
-    abstract function buildXml();
+    abstract public function buildXml();
 
     /**
      * @return XMLWriter
      */
-    protected function getXmlWriter() {
+    protected function getXmlWriter()
+    {
         return $this->_xmlWriter;
     }
 
     /**
      * @return DBManager
      */
-    protected function getDBManager() {
+    protected function getDBManager()
+    {
         return $this->_dbManager;
     }
 
-    protected function addLocaleAttribute() {
+    protected function addLocaleAttribute()
+    {
         $this->_xmlWriter->writeAttribute("locale", $this->_locale);
     }
-
 }

@@ -1,13 +1,13 @@
 <?php
 
-
 namespace OJSXml;
 
 use XMLWriter;
 
 define("ISSUE_COVERS_DIR", "csv/abstracts/issue_cover_images/");
 
-class IssuesXmlBuilder extends XMLBuilder {
+class IssuesXmlBuilder extends XMLBuilder
+{
     /** @var array $_sectionAbbreviations */
     private array $_sectionAbbreviations = array();
     private int $_iteration = 0;
@@ -25,7 +25,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      * @param string $articleGalleysDir
      * @param string $user
      */
-    public function __construct($filePath, &$dbManager, $issueCoversDir, $articleGalleysDir, $user) {
+    public function __construct($filePath, &$dbManager, $issueCoversDir, $articleGalleysDir, $user)
+    {
         parent::__construct($filePath, $dbManager);
         $this->_issueCoversDir = $issueCoversDir;
         $this->_articleGalleysDir = $articleGalleysDir;
@@ -35,14 +36,16 @@ class IssuesXmlBuilder extends XMLBuilder {
     /**
      * @param int $iteration Current loop of all files being written
      */
-    public function setIteration($iteration) {
+    public function setIteration($iteration)
+    {
         $this->_iteration =$iteration;
     }
 
     /**
      * Issue builder where one builder results one xml file for up to ISSUES_PER_FILE issues
      */
-    public function buildXml() {
+    public function buildXml()
+    {
         $this->getXmlWriter()->startElement("issues");
         $this->_setXmlnsAttributes(true);
 
@@ -67,7 +70,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $issueData
      */
-    function writeIssue($issueData) {
+    public function writeIssue($issueData)
+    {
         $this->getXmlWriter()->startElement("issue");
         $this->_setXmlnsAttributes();
         $this->getXmlWriter()->writeAttribute("published", "1");
@@ -85,7 +89,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $issueData Metadata about a single issue
      */
-    function writeIssueMetadata($issueData) {
+    public function writeIssueMetadata($issueData)
+    {
         $this->getXmlWriter()->startElement("issue_identification");
 
         if ($issueData['volume'] != "") {
@@ -122,7 +127,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      * @param string $titleName Issue title
      * @param string $volume Volume number
      */
-    function writeSections($titleName, $volume, $issue) {
+    public function writeSections($titleName, $volume, $issue)
+    {
         $sectionsData = $this->getDBManager()->getSectionsData($titleName, $volume, $issue);
 
         $this->getXmlWriter()->startElement("sections");
@@ -139,7 +145,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $sectionData
      */
-    function writeSection($sectionData) {
+    public function writeSection($sectionData)
+    {
         $this->getXmlWriter()->startElement("section");
         $sectionAbbrev = xmlFormat($sectionData["sectionAbbrev"]);
         $this->getXmlWriter()->writeAttribute("ref", $sectionAbbrev);
@@ -166,8 +173,11 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $issueData
      */
-    function writeIssueCover($issueData) {
-        if (trim($issueData["cover_image_filename"] == "")) return;
+    public function writeIssueCover($issueData)
+    {
+        if (trim($issueData["cover_image_filename"] == "")) {
+            return;
+        }
 
         $path = $this->_issueCoversDir . $issueData["cover_image_filename"];
         $type = pathinfo($path, PATHINFO_EXTENSION);
@@ -193,7 +203,6 @@ class IssuesXmlBuilder extends XMLBuilder {
 
         $this->getXmlWriter()->endElement();
         $this->getXmlWriter()->endElement();
-
     }
 
     /**
@@ -201,7 +210,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $issueData
      */
-    function writeArticles($issueData) {
+    public function writeArticles($issueData)
+    {
         $this->getXmlWriter()->startElement("articles");
         $this->_setXmlnsAttributes();
 
@@ -218,7 +228,6 @@ class IssuesXmlBuilder extends XMLBuilder {
             );
 
             foreach ($articlesData as $articleData) {
-
                 $articleData["currentId"] = (int) ($this->_issueIdPrefix . $currentId);
                 $articleData["publicationSeq"] = $publicationSeq;
                 $articleData["pages"] = $articleData["startPage"] . "-" . $articleData["endPage"];
@@ -238,11 +247,12 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $articleData
      */
-    function writeArticle($articleData) {
+    public function writeArticle($articleData)
+    {
         $this->getXmlWriter()->startElement("article");
-        $this->getXmlWriter()->writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+        $this->getXmlWriter()->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         $this->getXmlWriter()->writeAttribute("status", "3");
-        $this->getXmlWriter()->writeAttribute("stage" ,"production");
+        $this->getXmlWriter()->writeAttribute("stage", "production");
         $this->getXmlWriter()->writeAttribute("current_publication_id", $articleData["currentId"]);
 
         $this->_writeIdElement($articleData["currentId"]);
@@ -252,38 +262,39 @@ class IssuesXmlBuilder extends XMLBuilder {
         $this->writePublication($articleData);
 
         $this->getXmlWriter()->endElement();
-
     }
 
-    function _writeSubmissionFile(array $articleData) {
-
-        if (trim($articleData["fileName"] == "")) return;
+    public function _writeSubmissionFile(array $articleData)
+    {
+        if (trim($articleData["fileName"] == "")) {
+            return;
+        }
 
         $path = $this->_articleGalleysDir . $articleData["fileName"];
-		$filesize = filesize($path);
+        $filesize = filesize($path);
         $type = pathinfo($path, PATHINFO_EXTENSION);
         $data = file_get_contents($path);
         $articleGalleyBase64 = base64_encode($data);
 
         $this->getXmlWriter()->startElement("submission_file");
-        $this->getXmlWriter()->writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+        $this->getXmlWriter()->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         $this->getXmlWriter()->writeAttribute("id", $articleData["currentId"]);
-		$this->getXmlWriter()->writeAttribute("file_id", $articleData["currentId"]);
+        $this->getXmlWriter()->writeAttribute("file_id", $articleData["currentId"]);
         $this->getXmlWriter()->writeAttribute("stage", "proof");
         $this->getXmlWriter()->writeAttribute("viewable", "false");
         $this->getXmlWriter()->writeAttribute("genre", $this->_getGenreName());
         $this->getXmlWriter()->writeAttribute("uploader", $this->_user);
         $this->getXmlWriter()->writeAttribute("xsi:schemaLocation", "http://pkp.sfu.ca native.xsd");
 
-		$this->getXmlWriter()->startElement("name");
+        $this->getXmlWriter()->startElement("name");
         $this->addLocaleAttribute();
         $this->getXmlWriter()->writeRaw($this->_user . ", " . $articleData["fileName"]);
         $this->getXmlWriter()->endElement();
 
         $this->getXmlWriter()->startElement("file");
-		$this->getXmlWriter()->writeAttribute("id", $articleData["currentId"]);
-		$this->getXmlWriter()->writeAttribute("filesize", $filesize);
-		$this->getXmlWriter()->writeAttribute("extension", $type);
+        $this->getXmlWriter()->writeAttribute("id", $articleData["currentId"]);
+        $this->getXmlWriter()->writeAttribute("filesize", $filesize);
+        $this->getXmlWriter()->writeAttribute("extension", $type);
 
         $this->getXmlWriter()->startElement("embed");
         $this->getXmlWriter()->writeAttribute("encoding", "base64");
@@ -301,9 +312,10 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $articleData
      */
-    function writePublication($articleData) {
+    public function writePublication($articleData)
+    {
         $this->getXmlWriter()->startElement("publication");
-        $this->getXmlWriter()->writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+        $this->getXmlWriter()->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         $this->addLocaleAttribute();
         $this->getXmlWriter()->writeAttribute("version", "1");
         $this->getXmlWriter()->writeAttribute("status", "3");
@@ -329,8 +341,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $articleData
      */
-    function writePublicationMetadata($articleData) {
-
+    public function writePublicationMetadata($articleData)
+    {
         $doi = trim($articleData["DOI"]);
         if ($doi != "") {
             $this->getXmlWriter()->startElement("id");
@@ -375,7 +387,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $articleData
      */
-    function writeAuthors($articleData) {
+    public function writeAuthors($articleData)
+    {
         $authors = new Authors($articleData["authors"], $articleData["authorEmail"], $articleData["affiliations"]);
 
         $this->getXmlWriter()->startElement("authors");
@@ -390,7 +403,6 @@ class IssuesXmlBuilder extends XMLBuilder {
         }
 
         $this->getXmlWriter()->endElement();
-
     }
 
     /**
@@ -398,7 +410,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param array $autorData
      */
-    function writeAuthor($autorData) {
+    public function writeAuthor($autorData)
+    {
         $this->getXmlWriter()->startElement("author");
         $this->getXmlWriter()->writeAttribute("user_group_ref", "Author");
         // First author in list is considered primary contact
@@ -438,17 +451,18 @@ class IssuesXmlBuilder extends XMLBuilder {
         $this->getXmlWriter()->endElement();
     }
 
-    function writeArticleGalley($articleData) {
+    public function writeArticleGalley($articleData)
+    {
         $fileName = $articleData["fileName"];
         $fileExt = get_file_extension($fileName);
         // Disabled for OJS 3.2
 //        $pdfUrl = Config::get("pdf_url");
 
         $this->getXmlWriter()->startElement("article_galley");
-        $this->getXmlWriter()->writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+        $this->getXmlWriter()->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         $this->addLocaleAttribute();
         $this->getXmlWriter()->writeAttribute("approved", "false");
-        $this->getXmlWriter()->writeAttribute("xsi:schemaLocation","http://pkp.sfu.ca native.xsd");
+        $this->getXmlWriter()->writeAttribute("xsi:schemaLocation", "http://pkp.sfu.ca native.xsd");
 
         $this->_writeIdElement($articleData["currentId"]);
 
@@ -478,11 +492,12 @@ class IssuesXmlBuilder extends XMLBuilder {
     /**
      * @param false $includeSchemaLocation Includes xsi schema location
      */
-    function _setXmlnsAttributes($includeSchemaLocation = false) {
-        $this->getXmlWriter()->writeAttribute("xmlns","http://pkp.sfu.ca");
-        $this->getXmlWriter()->writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+    public function _setXmlnsAttributes($includeSchemaLocation = false)
+    {
+        $this->getXmlWriter()->writeAttribute("xmlns", "http://pkp.sfu.ca");
+        $this->getXmlWriter()->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         if ($includeSchemaLocation) {
-            $this->getXmlWriter()->writeAttribute("xsi:schemaLocation","http://pkp.sfu.ca native.xsd");
+            $this->getXmlWriter()->writeAttribute("xsi:schemaLocation", "http://pkp.sfu.ca native.xsd");
         }
     }
 
@@ -493,7 +508,8 @@ class IssuesXmlBuilder extends XMLBuilder {
      *
      * @param $currentId
      */
-    function _writeIdElement($currentId) {
+    public function _writeIdElement($currentId)
+    {
         $this->getXmlWriter()->startElement("id");
         $this->getXmlWriter()->writeAttribute("type", "internal");
         $this->getXmlWriter()->writeAttribute("advice", "ignore");
@@ -501,7 +517,8 @@ class IssuesXmlBuilder extends XMLBuilder {
         $this->getXmlWriter()->endElement();
     }
 
-    function _getGenreName() {
+    public function _getGenreName()
+    {
         $customFileGenre = Config::get('genreName');
         if (!empty($customFileGenre)) {
             return $customFileGenre;
