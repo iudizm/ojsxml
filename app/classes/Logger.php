@@ -9,7 +9,7 @@ class Logger
 {
     public static array $messages = [];
 
-    private static string $_fileName = '';
+    private static string $fileName = '';
 
     /**
      * @throws \Exception
@@ -20,7 +20,7 @@ class Logger
         $timestamp = time();
         $dt = new DateTime("now", new DateTimeZone($tz)); //first argument "must" be a string
         $dt->setTimestamp($timestamp); //adjust the object to correct timestamp
-        self::$_fileName = $dt->format('YmdHi') . '_log.txt';
+        self::$fileName = $dt->format('YmdHi') . '_log.txt';
     }
 
     public static function print(string $message)
@@ -32,7 +32,12 @@ class Logger
 
     public static function writeOut($command, $user)
     {
-        $file = fopen(Config::get('logLocation') . '/' . $command . '_' . $user . '_'. self::$_fileName, 'w');
+        $logPath = Config::get('logLocation');
+        if (!file_exists($logPath)) {
+            $logPath = dirname(__FILE__, 3);
+            Logger::print("Could not resolve 'logLocation': No such file or directory. Using $logPath instead.");
+        }
+        $file = fopen($logPath . '/' . $command . '_' . $user . '_' . self::$fileName, 'w');
         if ($file !== false) {
             fwrite($file, self::formatToString(self::$messages));
             fclose($file);
