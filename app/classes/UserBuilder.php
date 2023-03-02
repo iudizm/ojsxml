@@ -26,7 +26,6 @@ class UserBuilder
         $userData["affiliation"] = $this->csvUserData["affiliation"];
         $userData["country"] = $this->csvUserData["country"];
 
-        $userData["tempPassword"] = empty($this->csvUserData["tempPassword"]) ? $this->generateTempPassword() : $this->csvUserData["tempPassword"];
         $userData["reviewInterests"] = $this->csvUserData["reviewInterests"];
 
         for ($i = 1; $i < 6; $i++) {
@@ -40,9 +39,12 @@ class UserBuilder
 
     private function buildEmail()
     {
-        $emailData = explode(',', $this->csvUserData["email"]);
+        $emailData = explode(';', $this->csvUserData["email"]);
         if (sizeof($emailData) > 1) {
-            Logger::print($this->csvUserData["username"] . ' email truncated to first provided.');
+            $user = empty($this->csvUserData["username"])
+                ? $this->csvUserData["firstname"] . " " . $this->csvUserData["lastname"]
+                : $this->csvUserData["username"];
+            Logger::print("$user email truncated to first provided.");
         }
         $email = htmlspecialchars($emailData[0]);
 
@@ -54,13 +56,7 @@ class UserBuilder
         $username = $this->csvUserData["firstname"] . $this->csvUserData["lastname"];
         $username = preg_replace('/[^A-Za-z0-9]/', '', $username);
         $username = strtolower($username);
-        $username = substr($username, 0, 10);
+        $username = substr($username, 0, 10) . substr(rand(), 0, 2);
         return $username;
-    }
-
-    private function generateTempPassword()
-    {
-        $tempPassword = substr(md5(rand()), 0, 8);
-        return $tempPassword;
     }
 }

@@ -139,11 +139,17 @@ function userGroupRef($role)
     $role = trim($role);
     if ($role == "Journal manager") {
         return $role;
-    } elseif ($role=='Section editor') {
+    } elseif ($role == 'Section editor') {
         return $role;
-    } elseif ($role=='Reviewer') {
+    } elseif ($role == 'Reviewer') {
         return $role;
     } elseif ($role == 'Author') {
+        return $role;
+    } elseif ($role == 'Associate Editor') {
+        return $role;
+    } elseif ($role == 'Editor-in-Chief') {
+        return $role;
+    } elseif ($role == 'Publisher') {
         return $role;
     } else {
         return "Reader";

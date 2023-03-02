@@ -90,11 +90,9 @@ class UsersXmlBuilder extends XMLBuilder
 
         $xml->startElement("password");
         $xml->writeAttribute("must_change", "true");
-        // if (empty($userData["tempPassword"])) {
-        //     $xml->writeAttribute("encryption", "plaintext");
-        // }
+        $xml->writeAttribute("encryption", "plaintext");
         $xml->startElement("value");
-        $xml->writeRaw($userData["tempPassword"]);
+        $xml->writeRaw('');
         $xml->endElement();
 
         $xml->endElement();
