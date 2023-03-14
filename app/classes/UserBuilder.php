@@ -6,10 +6,12 @@ class UserBuilder
 {
     private array $csvUserData;
     private bool $isTest;
+    private array $generatedUsernames;
 
     public function __construct($isTest = false)
     {
         $this->isTest = $isTest;
+        $this->generatedUsernames = [];
     }
 
     public function buildUserData($csvUserData)
@@ -44,7 +46,7 @@ class UserBuilder
             $user = empty($this->csvUserData["username"])
                 ? $this->csvUserData["firstname"] . " " . $this->csvUserData["lastname"]
                 : $this->csvUserData["username"];
-            Logger::print("$user email truncated to first provided.");
+            Logger::print("$user email truncated to first provided: " . $emailData[0]);
         }
         $email = htmlspecialchars($emailData[0]);
 
@@ -56,7 +58,11 @@ class UserBuilder
         $username = $this->csvUserData["firstname"] . $this->csvUserData["lastname"];
         $username = preg_replace('/[^A-Za-z0-9]/', '', $username);
         $username = strtolower($username);
-        $username = substr($username, 0, 10) . substr(rand(), 0, 2);
+        $username = substr($username, 0, 10);
+        while (in_array($username, $this->generatedUsernames)) {
+            $username = $username . rand(0, 9);
+        }
+        $this->generatedUsernames[] = $username;
         return $username;
     }
 }
